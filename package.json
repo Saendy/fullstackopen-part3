@@ -4,8 +4,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "exho \\\"Error no test specified\\\" && exit 1"
+    "start": "node index.js",
+    "test": "echo \\\"Error no test specified\\\" && exit 1",
+    "dev": "nodemon index.js"
   },
   "author": "Jayden Saw",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
 }
