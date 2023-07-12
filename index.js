@@ -6,6 +6,8 @@ const app = express()
 
 app.use(express.json())
 
+app.use(express.static('build'))
+
 morgan.token('body', function (req, res) { return JSON.stringify(req.body) })
 app.use(morgan('tiny', {
   skip: function (req, res) { return req.method === "POST" }
@@ -84,6 +86,7 @@ app.get('/api/persons/:id', (request, response) => {
     response.json(body)
   })
 
-const PORT = 3001
-app.listen(PORT)
-console.log(`Server running on port ${PORT}`)
+  const PORT = process.env.PORT || 3001
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`)
+  })
