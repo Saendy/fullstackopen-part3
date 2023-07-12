@@ -1,13 +1,12 @@
 const express = require('express')
-
-var morgan = require('morgan')
+const cors = require('cors')
+const morgan = require('morgan')
 
 const app = express()
 
+app.use(express.json())
 
 morgan.token('body', function (req, res) { return JSON.stringify(req.body) })
-
-
 app.use(morgan('tiny', {
   skip: function (req, res) { return req.method === "POST" }
 }))
@@ -15,9 +14,7 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :b
   skip: function (req, res) { return req.method !== "POST" }
 }))
 
-
-
-app.use(express.json())
+app.use(cors())
 
 let phonebook = [
     { 
