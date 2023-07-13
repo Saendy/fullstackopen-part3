@@ -17,6 +17,7 @@ const App = (props) => {
   useEffect(() => {
     personService.getAll()
       .then(response => {
+        console.log(response)
         setPersons(response.data)
     })
   }, []);
@@ -33,20 +34,21 @@ const App = (props) => {
   }
 
   const deleteNumber = (event) => {
-    if (window.confirm(`Delete ${persons.find((person) => person.id === parseInt(event.target.value)).name}?`)) {
+    console.log(event.target.value, persons)
+    if (window.confirm(`Delete ${persons.find((person) => person.id === event.target.value).name}?`)) {
       personService.remove(event.target.value)
         .then( response => {
-          setMessage(`Removed ${persons.find((person) => person.id === parseInt(event.target.value)).name}`);
+          setMessage(`Removed ${persons.find((person) => person.id === event.target.value).name}`);
           setTimeout(() => {
             setMessage(null)
           }, 5000);
-          setPersons(persons.filter((person) => person.id !== parseInt(event.target.value)))
+          setPersons(persons.filter((person) => person.id !== event.target.value))
         })
         .catch(error => {
           setError(
-            `${persons.find((person) => person.id === parseInt(event.target.value)).name} was already removed from server`
+            `${persons.find((person) => person.id === event.target.value).name} was already removed from server`
           )
-          setPersons(persons.filter((person) => person.id !== parseInt(event.target.value)))
+          setPersons(persons.filter((person) => person.id !== event.target.value))
           setTimeout(() => {
             setError(null)
           }, 5000)

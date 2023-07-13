@@ -1,7 +1,10 @@
+require('dotenv').config()
+
 const express = require('express')
 const cors = require('cors')
 const morgan = require('morgan')
-
+const mongoose = require('mongoose')
+const Person = require('./models/person')
 const app = express()
 
 app.use(express.json())
@@ -17,6 +20,7 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :b
 }))
 
 app.use(cors())
+
 
 let phonebook = [
     { 
@@ -42,49 +46,83 @@ let phonebook = [
 ]
 
 app.get('/info', (request, response) => {
-    response.send(`<p>Phonebook has infor for ${phonebook.length} people</p><p>${Date()}</p>`)
+    Person.find({}).then (persons => {
+      response.send(`<p>Phonebook has info for ${persons.length} people</p><p>${Date()}</p>`)
+    })
 })
   
 app.get('/api/persons', (request, response) => {
-    response.json(phonebook)
+    Person.find({}).then(persons => {
+      response.json(persons)
+    })
 })
-app.get('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    const data = phonebook.find(person => person.id === id)
-    if(data) {
-        response.json(data)
-    }
-    else {
+app.get('/api/persons/:id', (request, response, next) => {
+    Person.findById(request.params.id).then(person => {
+      if(person) {
+        response.json(person)
+      } else {
         response.status(404).end()
-    }
-  })
-  app.delete('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    phonebook = phonebook.filter(person => person.id !== id)
-    response.status(204).end()
+      }
+    })
+    .catch(error => next(error))
   })
 
-  app.post('/api/persons', (request, response) => {
+  app.delete('/api/persons/:id', (request, response, next) => {
+    Person.findByIdAndRemove(request.params.id).then(person => {
+      response.status(204).end()
+    })
+    .catch(error => next(error))
+  })
+
+  app.post('/api/persons', (request, response, next) => {
     let body = request.body
     if (body.name && body.number ){
-        if(phonebook.find(person => person.name === body.name)) {
-            return response.status(400).json({ 
-                error: 'name must be unique' 
-              })
-        }
-        else{
-            newId = Math.floor(Math.random() * 9999999999)
-            phonebook.push({"id":newId, "name":body.name, "number":body.number})
-            body.id = newId
-        }
+        const newPerson = new Person({
+            name: body.name,
+            number: body.number
+          })
+          newPerson.save().then(savedPerson => {
+            response.json(savedPerson)
+          })
+          .catch(error => next(error))
+        
     }
     else {
         return response.status(400).json({ 
             error: 'request must contain name and number' 
           })
     }
-    response.json(body)
   })
+
+  app.put('/api/persons/:id', (request, response, next) => {
+    let body = request.body
+    const person ={
+      name: body.name,
+      number: body.number
+    }
+    Person.findByIdAndUpdate(request.params.id, person, { new: true})
+      .then(updatedPerson => {
+        response.json(updatedPerson)
+      })
+      .catch(error => next(error))
+  })
+
+
+  const errorHandler = (error, request, response, next) => {
+    console.log(error.name)
+    console.error(error.message)
+    
+  
+    if (error.name === 'CastError') {
+      return response.status(400).send({ error: 'malformatted id' })
+    } 
+  
+    next(error)
+  }
+  
+  app.use(errorHandler)
+
+
 
   const PORT = process.env.PORT || 3001
   app.listen(PORT, () => {
