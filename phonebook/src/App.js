@@ -17,7 +17,6 @@ const App = (props) => {
   useEffect(() => {
     personService.getAll()
       .then(response => {
-        console.log(response)
         setPersons(response.data)
     })
   }, []);
@@ -97,7 +96,7 @@ const App = (props) => {
         })
         .catch(error => {
           setError(
-            `${newName} was already added to server`
+            error.response.data.error
           )
           setTimeout(() => {
             setError(null)

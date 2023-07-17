@@ -2,13 +2,23 @@ POST http://localhost:3001/api/persons
 content-type: application/json
 
 {
-    "name": "sample",
-    "number": "Wed, 21 Oct 2015 18:27:50 GMT"
+    "name": "le",
+    "nber": "Wed, 21 Oct 2015 18:27:50 GMT"
 }
 
 ###
 
-DELETE http://localhost:3001/api/persons/4
+DELETE http://localhost:3001/api/persons/64af5aafb5625ac4598fe9b1
 ###
 
-GET  http://localhost:3001/api/persons/
+GET  http://localhost:3001/api/persons/64af621a2b98b9d8665d16ca
+
+###
+
+PUT http://localhost:3001/api/persons/64af5aca5ca7407b9aaa89f5
+content-type: application/json
+
+{
+    "name": "sample",
+    "number": "brongus"
+}
